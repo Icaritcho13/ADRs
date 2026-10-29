@@ -18,7 +18,7 @@
 | RF08 | Atualizar e consultar status do pedido | ADR-002 | `PedidoService`, eventos de domínio | Alterar status; consultar histórico de estados |
 | RF09 | Acompanhar entrega | ADR-002 | `EntregaService`, eventos de domínio | Atribuir entregador; atualizar e consultar status de entrega |
 | RF10 | Gerenciar estoque | ADR-001 | `EstoqueService`, bloqueio otimista (`@Version`) | Compra simultânea da última unidade → estoque nunca negativo |
-| RF11 | Controle de acesso por perfil | — ¹ | Spring Security, autorização por perfil (RBAC) | Testar acesso permitido e negado por perfil (cliente, lojista, entregador, admin) |
+| RF11 | Controle de acesso por perfil | ADR-006 | Spring Security, RBAC (`ROLE_LOJISTA`, `ROLE_ADMIN`) | Testar acesso permitido e negado por perfil (cliente, lojista, entregador, admin) |
 | RF12 | Avaliar pedido entregue | ADR-002 | `AvaliacaoService`, evento `PEDIDO_ENTREGUE` | Avaliação só disponível após status ENTREGUE (RN05) |
 
 ---
@@ -46,13 +46,11 @@
 | RNF03 | Consistência de estoque sob concorrência | ADR-001 | `EstoqueService`, bloqueio otimista | Estoque nunca negativo após compras simultâneas automatizadas |
 | RNF04 | Disponibilidade parcial (gateway indisponível) | ADR-004 | `PagamentoAdapter`, isolamento de falha | Simular gateway fora; catálogo e carrinho devem continuar operando |
 | RNF05 | Resiliência a timeout de pagamento | ADR-004 | `PagamentoAdapter`, timeout configurado | Simular timeout; pedido deve ir para PENDENTE_PAGAMENTO |
-| RNF06 | Segurança de dados | — ¹ | HTTPS, Spring Security, cartão não armazenado | Revisão de código; teste de acesso não autorizado; ausência de dados sensíveis em logs |
+| RNF06 | Segurança de dados | ADR-006 | Spring Security, JWT, cartão não armazenado (delegado ao gateway — ADR-004) | Revisão de código; teste de acesso não autorizado; ausência de dados sensíveis em logs |
 | RNF07 | Integrabilidade — troca de gateway | ADR-004 | Interface `GatewayPagamento`, `PagamentoAdapter` | Trocar implementação do adaptador sem alterar `PedidoService` |
 
 ---
 
 ## Notas
-
-¹ RF11 e RNF06 não possuem ADR dedicada porque são cobertos pela configuração de Spring Security e pela máquina de estados, não por uma decisão arquitetural isolada. Caso a equipe tome uma decisão explícita (ex.: JWT vs. sessão HTTP), registrar como ADR-006.
 
 > **Antes de entregar:** substituir os nomes de componentes pelos caminhos reais no repositório (ex.: `CatalogoService` → `src/main/java/.../catalogo/CatalogoService.java`) e confirmar que as ADRs referenciadas têm status `Aceito`.
